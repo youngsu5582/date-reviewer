@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  password  String
+  profile   Profile?
+  histories History[]
+}
+
+model Profile {
+  id             String   @id @default(uuid())
+  birthdate      DateTime
+  gender         Gender
+  residence      String
+  thumbnailImage String
+  name           String
+  user           User     @relation(fields: [userId], references: [id])
+  userId         String   @unique
+}
+
+model Place {
+  id        String    @id @default(uuid())
+  latitude  Float
+  longitude Float
+  kategory  Int
+  histories History[]
+}
+
+model Comment {
+  id        String  @id @default(uuid())
+  historyId String
+  userId    String
+  history   History @relation(fields: [historyId], references: [id])
+}
+
+model History {
+  id         String    @id @default(uuid())
+  user       User      @relation(fields: [userId], references: [id])
+  userId     String    @unique
+  places     Place[]
+  recommend  Int       @default(0)
+  totalPrice Int       @default(0)
+  comments   Comment[]
+}
+
+enum Gender {
+  M
+  W
+}
